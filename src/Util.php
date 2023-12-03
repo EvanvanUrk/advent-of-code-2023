@@ -22,18 +22,4 @@ class Util
     {
         return round(microtime(true) * 1000);
     }
-
-    public static function getBounds(array $positions, int $col)
-    {
-        $values = array_reduce(
-            $positions,
-            fn(array $carry, array $path) => array_merge(
-                $carry,
-                array_column($path, $col)
-            ),
-            []
-        );
-        sort($values);
-        return ['min' => reset($values), 'max' => end($values)];
-    }
 }

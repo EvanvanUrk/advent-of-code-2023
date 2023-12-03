@@ -4,76 +4,78 @@ declare(strict_types=1);
 
 namespace AoC;
 
+use AoC\Util\Map2D;
+
 class Day3 implements Solution
 {
+    private Map2D $map;
+
+    public function __construct(string $input) {
+        $this->map = new Map2D($input);
+    }
+
     public function part1(string $input): string
     {
-        $lines = Util::splitByLines($input);
-
         $numbers = [];
-        foreach($lines as $y => $line) {
-            $number = '';
-            $lLen = strlen($line);
-            for ($x = 0; $x < $lLen; $x++) {
-                $currentPosNumeric = is_numeric($line[$x]);
-                if ($currentPosNumeric) {
-                    $number .= $line[$x];
-                }
+        $currentNumber = '';
+        $this->map->walk(
+            function(int $x, int $y, string $val)
+                use (&$numbers, &$currentNumber) {
+                if (is_numeric($val)) { $currentNumber .= $val; }
 
-                if ($number === '') { continue; }
-                $endOfLine = $x === $lLen - 1;
-                if (!$currentPosNumeric || $endOfLine) {
-                    if ($currentPosNumeric && $endOfLine) { $x += 1; }
-                    if ($this->isPart($number, $lines, $x, $y, $lLen)) {
-                        $numbers[] = $number;
-                    }
-                    $number = '';
+                $next = $this->map->get($x + 1, $y);
+                if (!is_numeric($next)) {
+                    if ($currentNumber === '') { return; }
+                    $hasAdjacentSymbol = $this->map->findInRegion(
+                        $x - strlen($currentNumber),
+                        $x + 1,
+                        $y - 1,
+                        $y + 1,
+                        '/[^0-9.]/',
+                        true
+                    ) !== null;
+
+                    if ($hasAdjacentSymbol) { $numbers[] = $currentNumber; }
+
+                    $currentNumber = '';
                 }
             }
-        }
+        );
 
         return (string) array_sum($numbers);
     }
 
     public function part2(string $input): string
     {
-        $lines = Util::splitByLines($input);
-
         $ratios = [];
-        foreach($lines as $y => $line) {
-            $number = '';
-            $lLen = strlen($line);
-            for ($x = 0; $x < $lLen; $x++) {
-                $currentPosNumeric = is_numeric($line[$x]);
-                if ($currentPosNumeric) {
-                    $number .= $line[$x];
-                }
+        $currentNumber = '';
 
-                if ($number === '') { continue; }
-                $endOfLine = $x === $lLen - 1;
-                if (!$currentPosNumeric || $endOfLine) {
-                    if ($currentPosNumeric && $endOfLine) { $x += 1; }
-                    $yMin = $y - 1;
-                    $yMax = $y + 1;
-                    $xMax = $x; // current space is already after the number
-                    $xMin = $x - strlen($number) - 1;
+        $this->map->walk(
+            function(int $x, int $y, string $val)
+                use (&$ratios, &$currentNumber) {
+                if (is_numeric($val)) { $currentNumber .= $val; }
 
-                    foreach (range($yMin, $yMax) as $checkY) {
-                        foreach (range($xMin, $xMax) as $checkX) {
-                            if (isset($lines[$checkY]) && isset($lines[$checkY][$checkX])
-                                && $lines[$checkY][$checkX] === '*') {
-                                $ratioKey = $checkY . '-' . $checkX;
-                                if (!isset($ratios[$ratioKey])) { $ratios[$ratioKey] = []; }
-                                $ratios[$ratioKey][] = (int) $number;
-                                break 2;
-                            }
-                        }
+                $next = $this->map->get($x + 1, $y);
+                if (!is_numeric($next)) {
+                    if ($currentNumber === '') { return; }
+                    $pos = $this->map->findInRegion(
+                        $x - strlen($currentNumber),
+                        $x + 1,
+                        $y - 1,
+                        $y + 1,
+                        '*'
+                    );
+
+                    if ($pos !== null) {
+                        $ratioKey = $pos['x'] . '-' . $pos['y'];
+                        if (!isset($ratios[$ratioKey])) { $ratios[$ratioKey] = []; }
+                        $ratios[$ratioKey][] = (int) $currentNumber;
                     }
 
-                    $number = '';
+                    $currentNumber = '';
                 }
             }
-        }
+        );
 
         return (string) array_sum(
             array_map(
@@ -88,31 +90,5 @@ class Day3 implements Solution
                 )
             )
         );
-    }
-
-    public function isPart(
-        string $number,
-        array $lines,
-        int $x,
-        int $y,
-        int $lLen
-    ): bool {
-        $nLen = strlen($number);
-        $sEnd = min($x + 1, $lLen);
-        $sStart = max($x - $nLen - 1, 0);
-        $sLen = $sEnd - $sStart;
-
-        foreach ([-1, 0, 1] as $offset) {
-            if (isset($lines[$y + $offset])) {
-                $search = substr($lines[$y + $offset], $sStart, $sLen);
-
-                $match = preg_replace('/[0-9.]+/', '', $search);
-                if ($match !== '') {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }
