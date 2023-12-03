@@ -13,8 +13,13 @@ class Map2D
      */
     private array $map;
 
+    private int $w;
+
+    private int $h;
+
     /**
-     * Creates a 2D map from the puzzle input. Values are interpreted as single character strings.
+     * Creates a 2D map from the puzzle input. Values are interpreted as single
+     * character strings. Assumes all lines start at `x = 0`.
      */
     public function __construct(string $input)
     {
@@ -22,6 +27,14 @@ class Map2D
             fn(string $line) => mb_str_split($line),
             Util::splitByLines($input)
         );
+
+        $this->h = count($this->map);
+        $this->w = max(array_map(
+            function(array $line) {
+                return count($line);
+            },
+            $this->map
+        ));
     }
 
     public function get(int $x, int $y): ?string
@@ -33,16 +46,16 @@ class Map2D
     }
 
     /**
-     * Walks the puzzle input as a 2d map and executes a callback for each position
+     * Walks the puzzle left to right then top to bottom and executes a
+     * callback for each position. Reverses direction if `$reverse` is `true`.
      *
-     * @param string $input Puzzle input
-     * @param callable $callback Receives x/y coordinates and value at current pos
+     * @param callable(int $x, int $y, ?string $value): void $callback
      */
-    public function walk(callable $callback): void
+    public function walk(callable $callback, bool $reverse = false): void
     {
-        foreach ($this->map as $y => $line) {
-            foreach ($line as $x => $value) {
-                $callback($x, $y, $value);
+        foreach (Util::range(0, $this->h - 1, $reverse) as $y) {
+            foreach (Util::range(0, $this->w - 1, $reverse) as $x) {
+                $callback($x, $y, $this->get($x, $y));
             }
         }
     }
@@ -64,12 +77,8 @@ class Map2D
         bool $regexp = false,
         bool $reverseSearch = false,
     ): ?array {
-        $getRange = fn(int $min, int $max) => $reverseSearch
-            ? array_reverse(range($min, $max))
-            : range($min, $max);
-
-        foreach ($getRange($yMin, $yMax) as $y) {
-            foreach ($getRange($xMin, $xMax) as $x) {
+        foreach (Util::range($yMin, $yMax, $reverseSearch) as $y) {
+            foreach (Util::range($xMin, $xMax, $reverseSearch) as $x) {
                 $value = $this->get($x, $y);
                 if ($value === null) { continue; }
 

@@ -19,7 +19,7 @@ class Day3 implements Solution
         $numbers = [];
         $currentNumber = '';
         $this->map->walk(
-            function(int $x, int $y, string $val)
+            function(int $x, int $y, ?string $val)
                 use (&$numbers, &$currentNumber) {
                 if (is_numeric($val)) { $currentNumber .= $val; }
 
@@ -51,7 +51,7 @@ class Day3 implements Solution
         $currentNumber = '';
 
         $this->map->walk(
-            function(int $x, int $y, string $val)
+            function(int $x, int $y, ?string $val)
                 use (&$ratios, &$currentNumber) {
                 if (is_numeric($val)) { $currentNumber .= $val; }
 
