@@ -66,16 +66,20 @@ class Day5 implements Solution
             return false;
         };
 
-        $i = 0;
-        while (true) {
-            $seed = $i;
-            foreach ($this->maps->reverse() as $map) {
-                $seed = $map->get($seed, true);
-            }
-            if ($isInSeeds($seed)) { break; }
+        $loopWithStep = function(int $i, int $step = 1) use ($isInSeeds): int {
+            while (true) {
+                $seed = $i;
+                foreach ($this->maps->reverse() as $map) {
+                    $seed = $map->get($seed, true);
+                }
+                if ($isInSeeds($seed)) { return $i; }
 
-            $i += 1;
-        }
+                $i += $step;
+            }
+        };
+
+        $i = $loopWithStep(0, 10000);
+        $i = $loopWithStep($i - 10000, 1);
 
         return (string) $i;
     }
