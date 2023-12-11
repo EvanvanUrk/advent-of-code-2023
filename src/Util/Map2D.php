@@ -13,13 +13,13 @@ class Map2D
      */
     private array $map;
 
-    public readonly int $w;
+    private int $w;
 
-    public readonly int $h;
+    private int $h;
 
     /**
      * Creates a 2D map from the puzzle input. Values are interpreted as single
-     * character strings. Assumes all lines start at `x = 0`.
+     * character strings. Assumes all lines are of equal length.
      */
     public function __construct(string $input)
     {
@@ -51,6 +51,60 @@ class Map2D
             return;
         }
         $this->map[$y][$x] = $value;
+    }
+
+    public function getW(): int
+    {
+        return $this->w;
+    }
+
+    public function getH(): int
+    {
+        return $this->h;
+    }
+
+    public function getCol(int $x): ?array
+    {
+        if ($x >= $this->w) {
+            return null;
+        }
+
+        return array_reduce(
+            $this->map,
+            fn($col, $row) => array_merge($col, [$row[$x]]),
+            []
+        );
+    }
+
+    public function getRow(int $y): ?array
+    {
+        return $this->map[$y] ?? null;
+    }
+
+    public function insertCol(int $x, array $col): bool
+    {
+        if (count($col) !== $this->h || $x >= $this->w) {
+            return false;
+        }
+
+        $col = array_values($col);
+        foreach ($this->map as $i => &$row) {
+            array_splice($row, $x, 0, $col[$i]);
+        }
+        $this->w += 1;
+        return true;
+    }
+
+    public function insertRow(int $y, array $row): bool
+    {
+        if (count($row) !== $this->w || $y >= $this->h) {
+            return false;
+        }
+
+        $row = array_values($row);
+        array_splice($this->map, $y, 0, [$row]);
+        $this->h += 1;
+        return true;
     }
 
     /**
@@ -218,6 +272,9 @@ class Map2D
 
     public function __toString(): string
     {
-        return implode('', array_map(fn(array $line) => implode('', $line), $this->map));
+        return implode('', array_map(
+            fn(array $line) => implode('', $line) . PHP_EOL,
+            $this->map
+        ));
     }
 }

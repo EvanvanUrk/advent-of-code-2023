@@ -42,4 +42,21 @@ class Util
     {
         return ['x' => $x, 'y' => $y];
     }
+
+    public static function cartesianProduct(array $a, array $b): array
+    {
+        $product = [];
+        $added = [];
+        foreach ($a as $itemA) {
+            foreach ($b as $itemB) {
+                if (false === in_array($itemA . '-' . $itemB, $added)
+                    && false === in_array($itemB . '-' . $itemA, $added)) {
+                    $product[] = [$itemA, $itemB];
+                    $added[] = $itemA . '-' . $itemB;
+                }
+            }
+        }
+
+        return $product;
+    }
 }
