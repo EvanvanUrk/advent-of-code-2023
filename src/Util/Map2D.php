@@ -13,9 +13,9 @@ class Map2D
      */
     private array $map;
 
-    private int $w;
+    public readonly int $w;
 
-    private int $h;
+    public readonly int $h;
 
     /**
      * Creates a 2D map from the puzzle input. Values are interpreted as single
@@ -43,6 +43,14 @@ class Map2D
             return null;
         }
         return $this->map[$y][$x];
+    }
+
+    public function set(int $x, int $y, string $value): void
+    {
+        if (!isset($this->map[$y]) || !isset($this->map[$y][$x])) {
+            return;
+        }
+        $this->map[$y][$x] = $value;
     }
 
     /**
@@ -201,9 +209,15 @@ class Map2D
                     }
                     $matches[$value][] = ['x' => $x, 'y' => $y];
                 }
-            }
+            },
+            $reverseSearch
         );
 
         return $matches;
+    }
+
+    public function __toString(): string
+    {
+        return implode('', array_map(fn(array $line) => implode('', $line), $this->map));
     }
 }
