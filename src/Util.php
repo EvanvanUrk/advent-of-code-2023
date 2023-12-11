@@ -37,4 +37,9 @@ class Util
         $range = range($start, $end, $step);
         return $reverse ? array_reverse($range) : $range;
     }
+
+    public static function point(int $x, int $y): array
+    {
+        return ['x' => $x, 'y' => $y];
+    }
 }
