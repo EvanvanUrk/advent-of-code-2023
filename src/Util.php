@@ -59,4 +59,16 @@ class Util
 
         return $product;
     }
+
+    /**
+     * Because in_array will always return true if you search for null...
+     */
+    public static function inArray(mixed $value, array $array): bool
+    {
+        foreach ($array as $val) {
+            if ($val === $value) { return true; }
+        }
+
+        return false;
+    }
 }
