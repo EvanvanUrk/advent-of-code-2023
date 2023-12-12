@@ -18,23 +18,29 @@ class Map2D
     private int $h;
 
     /**
-     * Creates a 2D map from the puzzle input. Values are interpreted as single
-     * character strings. Assumes all lines are of equal length.
+     * Creates a 2D map from a 2 dimensional array. Assumes all rows are of equal length.
      */
-    public function __construct(string $input)
+    public function __construct(array $map)
     {
-        $this->map = array_map(
+        $this->map = $map;
+
+        $this->h = count($this->map);
+        $this->w = max(array_map(
+            function(array $row) {
+                return count($row);
+            },
+            $this->map
+        ));
+    }
+
+    public static function fromInput(string $input): Map2D
+    {
+        $map = array_map(
             fn(string $line) => mb_str_split($line),
             Util::splitByLines($input)
         );
 
-        $this->h = count($this->map);
-        $this->w = max(array_map(
-            function(array $line) {
-                return count($line);
-            },
-            $this->map
-        ));
+        return new Map2D($map);
     }
 
     public function get(int $x, int $y): ?string
@@ -143,6 +149,29 @@ class Map2D
                 }
             }
         }
+    }
+
+    public function map(callable $callback): Map2D
+    {
+        return $this->mapRegion(0, $this->w - 1, 0, $this->h - 1, $callback);
+    }
+
+    public function mapRegion(
+        int $xMin,
+        int $xMax,
+        int $yMin,
+        int $yMax,
+        callable $callback
+    ): Map2D {
+        $map = [];
+        foreach (Util::range($yMin, $yMax) as $y) {
+            $map[$y] = [];
+            foreach (Util::range($xMin, $xMax) as $x) {
+                $map[$y][$x] == $callback($x, $y, $this->get($x, $y));
+            }
+        }
+
+        return new Map2D($map);
     }
 
     /**

@@ -12,7 +12,7 @@ class Day11 implements Solution
 
     public function part1(string $input): string
     {
-        $this->map = new Map2D($input);
+        $this->map = Map2D::fromInput($input);
 
         $x = 0;
         while ($x < $this->map->getW()) {
@@ -41,7 +41,7 @@ class Day11 implements Solution
 
     public function part2(string $input): string
     {
-        $this->map = new Map2D($input);
+        $this->map = Map2D::fromInput($input);
 
         $emptyCols = [];
         foreach (range(0, $this->map->getW() - 1) as $x) {

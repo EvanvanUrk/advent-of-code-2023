@@ -26,7 +26,7 @@ class Day10 implements Solution
             'L' => [Util::point( 1, 0), Util::point( 0, -1)],
             'J' => [Util::point(-1, 0), Util::point( 0, -1)]
         ];
-        $this->map = new Map2D($input);
+        $this->map = Map2D::fromInput($input);
         $this->start = $this->map->find('S');
         $this->route = $this->findRoute();
     }
@@ -38,25 +38,64 @@ class Day10 implements Solution
 
     public function part2(string $input): string
     {
-        // For each position in the route store whether the pos was entered or
-        // left upwards or downwards. It's impossible for a position to be
-        // entered upwards and left downwards or vice versa.
+        // Set a toggle for counting steps to FALSE.
         //
-        // Walk from left to right counting between DOWN and UP or UP and DOWN,
-        // depending on which one you encounter first.
+        // Walk from left to right.
+        // Increment counter for every step where the toggle is TRUE.
         //
-        // Keep walking until the first downward part of the route is found.
-        // Walk through upwards parts of the map but don't count them.
+        // If toggle is TRUE, current is NOT part of route and next step is part of route
+        // OR if toggle is FALSE, current is part of route and next step is NOT part of route
+        // i.e. when $toggle !== $isCurPartOfRoute && $toggle === $isNextPartOfRoute
+        // Set $toggle to !$toggle
+        // Set toggle to TRUE when you find a part of the route that is
+        // positioned LEFT of a space that IS NOT part of the route.
+        // Else set toggle to FALSE when the next position to the right
+        // IS part of the route.
         //
-        // I.e. 1 v ..F--7 ^
-        //      2 v F-J..| ^
-        //      2 v L----J ^
-        // 1: Start reading at F and stop at 7, not counting any part
-        // 2: Start reading at F and stop at |, but don't count the "-J"
-        // section of pipe.
+        // I.e. 1 ..F--7
+        //      2 F-J..|
+        //      3 L----J
+        // 1: Never toggles because no part of the route is left of a
+        //    space not part of the route
+        // 2: Start counting after J (left of open space) and stop before |
+        //    (right of open space)
         // 3: Start reading at L and stop at J, not counting any part
 
-        return '';
+        $countStep = false;
+        $count = 0;
+        $newMap = $this->map->map(
+            function($x, $y, $value) use (&$countStep, &$count) {
+                $next = $this->map->get($x + 1, $y);
+                if (null === $next) {
+                    $countStep = false;
+                }
+
+                $isCurInRoute = $this->isPosInRoute($x, $y);
+                $isNextInRoute = $this->isPosInRoute($x + 1, $y);
+
+                $mapped = 'O';
+                if ($isCurInRoute) {
+                    $mapped = $value;
+                }
+
+                if ($countStep) {
+                    $mapped = 'I';
+                }
+
+                if ($countStep && false === $isCurInRoute) { $count += 1; }
+                if (false === $isCurInRoute && true === $isNextInRoute) {
+                    $countStep = false;
+                } elseif (false === $isCurInRoute && true === $isNextInRoute) {
+                    $countStep = true;
+                }
+
+                return $mapped;
+            }
+        );
+
+        echo $newMap . PHP_EOL;
+
+        return (string) $count;
     }
 
     private function findRoute(): array
@@ -100,5 +139,10 @@ class Day10 implements Solution
         } while ($current !== $this->start);
 
         return $route;
+    }
+
+    private function isPosInRoute(int $x, int $y): bool
+    {
+        return in_array(Util::point($x, $y), $this->route);
     }
 }

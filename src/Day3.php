@@ -11,7 +11,7 @@ class Day3 implements Solution
     private Map2D $map;
 
     public function __construct(string $input) {
-        $this->map = new Map2D($input);
+        $this->map = Map2D::fromInput($input);
     }
 
     public function part1(string $input): string
