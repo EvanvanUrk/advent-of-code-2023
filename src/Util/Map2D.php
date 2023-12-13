@@ -11,11 +11,11 @@ class Map2D
     /**
      * @var array<int, array<int, string>> Map values indexed by Y first, X second
      */
-    private array $map;
+    protected array $map;
 
-    private int $w;
+    protected int $w;
 
-    private int $h;
+    protected int $h;
 
     /**
      * Creates a 2D map from a 2 dimensional array. Assumes all rows are of equal length.
@@ -33,14 +33,17 @@ class Map2D
         ));
     }
 
-    public static function fromInput(string $input): Map2D
+    public static function fromInput(string $input): self
     {
-        $map = array_map(
+        return new Map2D(self::parseInput($input));
+    }
+
+    protected static function parseInput(string $input): array
+    {
+        return array_map(
             fn(string $line) => mb_str_split($line),
             Util::splitByLines($input)
         );
-
-        return new Map2D($map);
     }
 
     public function get(int $x, int $y): ?string
