@@ -170,7 +170,7 @@ class Map2D
         foreach (Util::range($yMin, $yMax) as $y) {
             $map[$y] = [];
             foreach (Util::range($xMin, $xMax) as $x) {
-                $map[$y][$x] == $callback($x, $y, $this->get($x, $y));
+                $map[$y][$x] = $callback($x, $y, $this->get($x, $y));
             }
         }
 
