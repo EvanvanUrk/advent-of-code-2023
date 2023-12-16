@@ -38,6 +38,17 @@ class Map2D
         return new Map2D(self::parseInput($input));
     }
 
+    public static function fromFill(int $width, int $height, string $fill): self
+    {
+        return new Map2D(
+            array_fill(
+                0,
+                $height,
+                array_fill(0, $width, $fill)
+            )
+        );
+    }
+
     protected static function parseInput(string $input): array
     {
         return array_map(
@@ -54,12 +65,22 @@ class Map2D
         return $this->map[$y][$x];
     }
 
+    public function getPoint(Point $pos): ?string
+    {
+        return $this->get($pos->x, $pos->y);
+    }
+
     public function set(int $x, int $y, string $value): void
     {
         if (!isset($this->map[$y]) || !isset($this->map[$y][$x])) {
             return;
         }
         $this->map[$y][$x] = $value;
+    }
+
+    public function setPoint(Point $pos, string $value)
+    {
+        $this->set($pos->x, $pos->y, $value);
     }
 
     public function getW(): int
