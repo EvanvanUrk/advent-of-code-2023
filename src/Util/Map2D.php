@@ -118,20 +118,20 @@ class Map2D
 
     /**
      * Walks the map left to right then top to bottom and executes a callback for
-     * each position. Reverses direction if `$reverse` is `true`.
+     * each position.
      *
      * @param callable(int $x, int $y, ?string $value): bool $callback
      * Callback to execute. May return `true` to immediately stop walking the map.
      * Should return false or void to only stop the current callback.
      */
-    public function walk(callable $callback, bool $reverse = false): void
+    public function walk(callable $callback, bool $reverseX = false, bool $reverseY = false): void
     {
-        $this->walkRegion(0, $this->w - 1, 0, $this->h - 1, $callback, $reverse);
+        $this->walkRegion(0, $this->w - 1, 0, $this->h - 1, $callback, $reverseX, $reverseY);
     }
 
     /**
      * Walks a region of the map left to right then top to bottom and executes a
-     * callback for each position. Reverses direction if `$reverse` is `true`.
+     * callback for each position.
      *
      * @param callable(int $x, int $y, ?string $value): bool $callback
      * Callback to execute. May return `true` to immediately stop walking the map.
@@ -143,10 +143,11 @@ class Map2D
         int $yMin,
         int $yMax,
         callable $callback,
-        bool $reverse = false,
+        bool $reverseX = false,
+        bool $reverseY = false,
     ): void {
-        foreach (Util::range($yMin, $yMax, $reverse) as $y) {
-            foreach (Util::range($xMin, $xMax, $reverse) as $x) {
+        foreach (Util::range($yMin, $yMax, $reverseY) as $y) {
+            foreach (Util::range($xMin, $xMax, $reverseX) as $x) {
                 if (true === $callback($x, $y, $this->get($x, $y))) {
                     break 2;
                 }
@@ -179,8 +180,7 @@ class Map2D
 
     /**
      * Searches the map for the given search term or expression and returns the
-     * first match. Searches from left to right then top to bottom by default,
-     * or from right to left then bottom to top if `$reverseSearch` is `true`.
+     * first match. Searches from left to right then top to bottom by default.
      *
      * @return null|array{'x': int, 'y': int} Array with coordinates of first
      * match. Null if search was not found or matched.
@@ -188,7 +188,8 @@ class Map2D
     public function find(
         string $search,
         bool $regexp = false,
-        bool $reverseSearch = false
+        bool $reverseX = false,
+        bool $reverseY = false,
     ): ?array {
         return $this->findInRegion(
             0,
@@ -197,15 +198,15 @@ class Map2D
             $this->h - 1,
             $search,
             $regexp,
-            $reverseSearch
+            $reverseX,
+            $reverseY
         );
     }
 
     /**
      * Searches a region of the map for the given search term or expression and
      * returns the first match. Searches from left to right then top to bottom
-     * by default, or from right to left then bottom to top if `$reverseSearch`
-     * is `true`.
+     * by default.
      *
      * @return null|array{'x': int, 'y': int} Array with coordinates of first
      * match. Null if search was not found or matched.
@@ -217,7 +218,8 @@ class Map2D
         int $yMax,
         string $search,
         bool $regexp = false,
-        bool $reverseSearch = false,
+        bool $reverseX = false,
+        bool $reverseY = false
     ): ?array {
         $match = null;
         $this->walkRegion(
@@ -234,15 +236,15 @@ class Map2D
 
                 return false;
             },
-            $reverseSearch
+            $reverseX,
+            $reverseY
         );
 
         return $match;
     }
     /**
      * Searches the map for the given search term or expression and returns all
-     * matches. Searches from left to right then top to bottom by default, or
-     * from right to left then bottom to top if `$reverseSearch` is `true`.
+     * matches. Searches from left to right then top to bottom by default.
      *
      * @return array<string, array{'x': int, 'y': int}> Coordinates per match
      * indexed by value. Empty if search was not found or matched.
@@ -250,7 +252,8 @@ class Map2D
     public function findAll(
         string $search,
         bool $regexp = false,
-        bool $reverseSearch = false
+        bool $reverseX = false,
+        bool $reverseY = false
     ): array {
         return $this->findAllInRegion(
             0,
@@ -259,15 +262,15 @@ class Map2D
             $this->h - 1,
             $search,
             $regexp,
-            $reverseSearch
+            $reverseX,
+            $reverseY
         );
     }
 
     /**
      * Searches a region of the map for the given search term or expression and
      * returns all matches. Searches from left to right then top to bottom by
-     * default, or from right to left then bottom to top if `$reverseSearch`
-     * is `true`.
+     * default.
      *
      * @return array<string, array{'x': int, 'y': int}> Coordinates per match.
      * indexed by value. Empty if search was not found or matched.
@@ -279,7 +282,8 @@ class Map2D
         int $yMax,
         string $search,
         bool $regexp = false,
-        bool $reverseSearch = false,
+        bool $reverseX = false,
+        bool $reverseY = false
     ): array {
         $matches = [];
         $this->walkRegion(
@@ -296,7 +300,8 @@ class Map2D
                     $matches[$value][] = ['x' => $x, 'y' => $y];
                 }
             },
-            $reverseSearch
+            $reverseX,
+            $reverseY
         );
 
         return $matches;
