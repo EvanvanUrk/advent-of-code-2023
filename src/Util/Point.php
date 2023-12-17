@@ -31,4 +31,9 @@ class Point
             $this->y - $point->y
         );
     }
+
+    public function opposite(): Point
+    {
+        return new Point(-$this->x, -$this->y);
+    }
 }
