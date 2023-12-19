@@ -2,6 +2,10 @@
 
 namespace AoC;
 
+use AoC\Util\Map2D;
+use AoC\Util\Point;
+use AoC\Util\Route;
+
 class Util
 {
     public static function getInput(int $day, string $prefix = 'day'): string
@@ -70,5 +74,80 @@ class Util
         }
 
         return false;
+    }
+
+    public static function rgbHexToIntArray(string $hex): array
+    {
+        return array_combine(['r', 'g', 'b'], array_map(
+            fn(array $chunk) => (int) hexdec($chunk[0] . $chunk[1]),
+            array_chunk(str_split(substr($hex, 1)), 2)
+        ));
+    }
+
+    public static function asRgbOutput(
+        string $val,
+        int $r, int $g, int $b,
+    ): string {
+        return sprintf(
+            "\033[48;2;0;0;0m\033[38;2;%d;%d;%dm%s\033[0m",
+            $r, $g, $b, $val
+        );
+    }
+
+    /**
+     * Count cells within the area of a closed route. Assumes the route
+     * contains only positions within the given map.
+     */
+    public static function countCellsInsideRoute(Route $route, Map2D $map): int
+    {
+        $direction = [];
+
+        foreach ($route->get() as $idx => $cur) {
+            if ($map->get($cur->x, $cur->y))
+            $prev = array_slice(
+                $route->get(),
+                $idx - 1,
+                1
+            )[0];
+            $next = array_slice(
+                $route->get(),
+                ($idx + 1) % $route->count(),
+                1
+            )[0];
+
+            $key = $cur->getKey();
+            if ($prev->y > $cur->y || $next->y < $cur->y) {
+                $direction[$key] = true; // up
+            } else if ($prev->y < $cur->y || $next->y > $cur->y) {
+                $direction[$key] = false; // down
+            }
+        }
+
+        $countStep = false;
+        $count = 0;
+        $clockwise = null;
+        $newMap = $map->map(
+            function($x, $y, $value)
+                use ($direction, &$countStep, &$count, &$clockwise, $route)
+            {
+                $key = $x . '-' . $y;
+                if (isset($direction[$key])) {
+                    if (null === $clockwise) {
+                        $clockwise = $direction[$key];
+                    }
+                    $countStep = $direction[$key] === $clockwise;
+                }
+
+                if ($route->hasKey($key)) { return $value; }
+
+                if ($countStep) { $count += 1; }
+
+                return $countStep ? 'I': 'O';
+            }
+        );
+
+//        echo $newMap . PHP_EOL;
+
+        return (string) $count;
     }
 }
