@@ -6,7 +6,7 @@ namespace AoC;
 
 use AoC\Solution;
 use AoC\Util\Map2D;
-use AoC\Util\Point;
+use AoC\Util\Vec2D;
 use Exception;
 use SplPriorityQueue;
 
@@ -14,13 +14,13 @@ class Day17 implements Solution
 {
     private Map2D $map;
 
-    private Point $stop;
+    private Vec2D $stop;
 
     public function __construct(string $input)
     {
         $this->map = Map2D::fromInput($input);
-        $this->start = new Point(0, 0);
-        $this->stop = new Point(
+        $this->start = new Vec2D(0, 0);
+        $this->stop = new Vec2D(
             $this->map->getW() - 1,
             $this->map->getH() - 1,
         );
@@ -31,7 +31,7 @@ class Day17 implements Solution
         $seen = [];
 
         $queue = new SplPriorityQueue();
-        foreach ([new Point(1, 0), new Point(0, 1)] as $next) {
+        foreach ([new Vec2D(1, 0), new Vec2D(0, 1)] as $next) {
             $cost = (int) $this->map->getPoint($next);
             $queue->insert(new Crucible(
                 $next,
@@ -68,7 +68,7 @@ class Day17 implements Solution
         $seen = [];
 
         $queue = new SplPriorityQueue();
-        foreach ([new Point(1, 0), new Point(0, 1)] as $next) {
+        foreach ([new Vec2D(1, 0), new Vec2D(0, 1)] as $next) {
             $cost = (int) $this->map->getPoint($next);
             $queue->insert(new UltraCrucible(
                 $next,
@@ -127,20 +127,20 @@ class Day17 implements Solution
 class Crucible
 {
     public function __construct(
-        public readonly Point $pos,
-        public readonly Point $dir,
-        public readonly int $movesInDir,
-        public readonly int $heatLoss,
+        public readonly Vec2D $pos,
+        public readonly Vec2D $dir,
+        public readonly int   $movesInDir,
+        public readonly int   $heatLoss,
         public readonly ?self $prev,
     ) { }
 
     public function possibleMoves(Map2D $map): array
     {
         $dirs = [
-            new Point(1, 0),
-            new Point(-1, 0),
-            new Point(0, 1),
-            new Point(0, -1),
+            new Vec2D(1, 0),
+            new Vec2D(-1, 0),
+            new Vec2D(0, 1),
+            new Vec2D(0, -1),
         ];
 
         $moves = [];
@@ -161,7 +161,7 @@ class Crucible
         return $moves;
     }
 
-    protected function next(Point $dir, Map2D $map): ?self
+    protected function next(Vec2D $dir, Map2D $map): ?self
     {
         $nextPos = $this->pos->add($dir);
         $nextCost = $map->getPoint($nextPos);
@@ -203,10 +203,10 @@ class UltraCrucible extends Crucible
         }
 
         $dirs = [
-            new Point(1, 0),
-            new Point(-1, 0),
-            new Point(0, 1),
-            new Point(0, -1),
+            new Vec2D(1, 0),
+            new Vec2D(-1, 0),
+            new Vec2D(0, 1),
+            new Vec2D(0, -1),
         ];
 
         $moves = [];
@@ -221,7 +221,7 @@ class UltraCrucible extends Crucible
             }
 
             if ($dir != $this->dir) {
-                $minCheckPos = $this->pos->add(new Point(
+                $minCheckPos = $this->pos->add(new Vec2D(
                     $dir->x * 4,
                     $dir->y * 4,
                 ));

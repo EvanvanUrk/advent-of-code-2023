@@ -6,7 +6,7 @@ namespace AoC;
 
 use AoC\Solution;
 use AoC\Util\Map2D;
-use AoC\Util\Point;
+use AoC\Util\Vec2D;
 use AoC\Util\Route;
 use Illuminate\Support\Collection;
 
@@ -52,7 +52,7 @@ class Day18 implements Solution
             foreach (range(0, $cur['len'] - 1) as $i) {
                 $x += $move->x;
                 $y += $move->y;
-                $cur['pos'] = new Point($x + -$minX, $y + -$minY);
+                $cur['pos'] = new Vec2D($x + -$minX, $y + -$minY);
                 $route->add($cur['pos']);
                 $map->set(
                     $x,
@@ -124,7 +124,7 @@ class Day18 implements Solution
             foreach (range(0, $cur['len'] - 1) as $i) {
                 $x += $move->x;
                 $y += $move->y;
-                $cur['pos'] = new Point($x + -$minX, $y + -$minY);
+                $cur['pos'] = new Vec2D($x + -$minX, $y + -$minY);
                 $route->add($cur['pos']);
                 $map->set(
                     $x,
@@ -162,13 +162,13 @@ enum Direction: string
     case Right = 'R';
     case Left = 'L';
 
-    public function getMove(): Point
+    public function getMove(): Vec2D
     {
         return match ($this) {
-            Direction::Up => new Point(0, -1),
-            Direction::Down => new Point(0, 1),
-            Direction::Right => new Point(1, 0),
-            Direction::Left => new Point(-1, 0),
+            Direction::Up => new Vec2D(0, -1),
+            Direction::Down => new Vec2D(0, 1),
+            Direction::Right => new Vec2D(1, 0),
+            Direction::Left => new Vec2D(-1, 0),
         };
     }
 }

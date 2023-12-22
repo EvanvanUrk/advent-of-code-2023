@@ -26,6 +26,15 @@ class Day12 implements Solution
 
     public function part2(string $input): string
     {
+        $lines = Util::splitByLines($input);
+        foreach ($lines as $line) {
+            $parts = explode(' ', $line);
+        }
+
+        // For each record find the lengths that are already in place. Split
+        // the remaining substrings with the required lengths and recursively
+        // brute force those. Cache the results by function args.
+
         return '';
     }
 

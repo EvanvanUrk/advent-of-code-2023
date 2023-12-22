@@ -65,7 +65,7 @@ class Map2D
         return $this->map[$y][$x];
     }
 
-    public function getPoint(Point $pos): ?string
+    public function getPoint(Vec2D $pos): ?string
     {
         return $this->get($pos->x, $pos->y);
     }
@@ -78,7 +78,7 @@ class Map2D
         $this->map[$y][$x] = $value;
     }
 
-    public function setPoint(Point $pos, string $value)
+    public function setPoint(Vec2D $pos, string $value)
     {
         $this->set($pos->x, $pos->y, $value);
     }
@@ -293,8 +293,8 @@ class Map2D
      * returns all matches. Searches from left to right then top to bottom by
      * default.
      *
-     * @return array<string, array{'x': int, 'y': int}> Coordinates per match.
-     * indexed by value. Empty if search was not found or matched.
+     * @return array<string, array<array{'x': int, 'y': int}>> Coordinates per
+     * match, indexed by value. Empty if search was not found or matched.
      */
     public function findAllInRegion(
         int $xMin,

@@ -6,7 +6,7 @@ namespace AoC;
 
 use AoC\Solution;
 use AoC\Util\Map2D;
-use AoC\Util\Point;
+use AoC\Util\Vec2D;
 
 class Day16 implements Solution
 {
@@ -19,20 +19,20 @@ class Day16 implements Solution
 
     public function part1(string $input): string
     {
-        return (string) $this->energize(new Point(0, 0), new Point(1, 0));
+        return (string) $this->energize(new Vec2D(0, 0), new Vec2D(1, 0));
     }
 
     public function part2(string $input): string
     {
         $dirs = [
-            new Point( 1,  0),
-            new Point( 0,  1),
-            new Point(-1,  0),
-            new Point( 0, -1)
+            new Vec2D( 1,  0),
+            new Vec2D( 0,  1),
+            new Vec2D(-1,  0),
+            new Vec2D( 0, -1)
         ];
 
         $energies = [];
-        $pos = new Point(0, 0);
+        $pos = new Vec2D(0, 0);
         foreach ($dirs as $i => $dir) {
             $beamDir = $dirs[($i + 1) % 4];
             while (null !== $this->map->getPoint($pos)) {
@@ -45,7 +45,7 @@ class Day16 implements Solution
         return (string) max($energies);
     }
 
-    private function energize(Point $startPos, Point $startDir): int
+    private function energize(Vec2D $startPos, Vec2D $startDir): int
     {
         $lightMap = $this->beam($startPos, $startDir);
 
@@ -55,7 +55,7 @@ class Day16 implements Solution
         ;
     }
 
-    private function beam(Point $startPos, Point $startDir): Map2D
+    private function beam(Vec2D $startPos, Vec2D $startDir): Map2D
     {
         $lightMap = Map2D::fromFill(
             $this->map->getW(),
@@ -63,7 +63,7 @@ class Day16 implements Solution
             '.'
         );
 
-        $setStrength = function(Point $pos) use ($lightMap) {
+        $setStrength = function(Vec2D $pos) use ($lightMap) {
             $posStrength = $lightMap->getPoint($pos);
             $lightMap->setPoint(
                 $pos,
@@ -108,9 +108,9 @@ class Day16 implements Solution
     }
 
     /**
-     * @return array<Point>
+     * @return array<Vec2D>
      */
-    private function mirror(string $mirror, Point $dir): array
+    private function mirror(string $mirror, Vec2D $dir): array
     {
         if ($dir->x === 0 && $dir->y === 0) {
             return [$dir];
@@ -121,10 +121,10 @@ class Day16 implements Solution
         }
 
         return match ($mirror) {
-            '/' => [new Point($dir->y * -1, $dir->x * -1)],
-            '\\' => [new Point($dir->y, $dir->x)],
-            '-' => $dir->x === 0 ? [new Point($dir->y, 0), new Point(-$dir->y, 0)] : [$dir],
-            '|' => $dir->y === 0 ? [new Point(0, $dir->x), new Point(0, -$dir->x)] : [$dir],
+            '/' => [new Vec2D($dir->y * -1, $dir->x * -1)],
+            '\\' => [new Vec2D($dir->y, $dir->x)],
+            '-' => $dir->x === 0 ? [new Vec2D($dir->y, 0), new Vec2D(-$dir->y, 0)] : [$dir],
+            '|' => $dir->y === 0 ? [new Vec2D(0, $dir->x), new Vec2D(0, -$dir->x)] : [$dir],
             default => [$dir],
         };
     }

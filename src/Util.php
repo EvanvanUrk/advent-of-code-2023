@@ -3,7 +3,7 @@
 namespace AoC;
 
 use AoC\Util\Map2D;
-use AoC\Util\Point;
+use AoC\Util\Vec2D;
 use AoC\Util\Route;
 
 class Util
@@ -149,5 +149,11 @@ class Util
 //        echo $newMap . PHP_EOL;
 
         return (string) $count;
+    }
+
+    public static function mod(int $dividend, int $divisor): int
+    {
+        $mod = $dividend % $divisor;
+        return $mod < 0 ? $mod + $dividend : $mod;
     }
 }

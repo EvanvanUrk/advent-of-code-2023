@@ -11,6 +11,7 @@ class Day8 implements Solution
 {
     private Collection $instructions;
     private array $map;
+
     public function __construct(string $input)
     {
         $parts = explode(PHP_EOL . PHP_EOL, trim($input));

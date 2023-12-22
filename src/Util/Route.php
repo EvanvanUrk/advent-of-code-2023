@@ -8,7 +8,7 @@ use mysql_xdevapi\Warning;
 
 class Route
 {
-    private ?Point $head = null;
+    private ?Vec2D $head = null;
 
     private int $len = 0;
 
@@ -16,7 +16,7 @@ class Route
     private array $set = [];
 
     /**
-     * @param array<Point> $route
+     * @param array<Vec2D> $route
      */
     public function __construct(
         private array $route = [],
@@ -41,7 +41,7 @@ class Route
         return $this->len;
     }
 
-    public function add(Point $point): bool
+    public function add(Vec2D $point): bool
     {
         if ($this->head !== null) {
             $diff = $point->sub($this->head);
@@ -55,7 +55,7 @@ class Route
         return true;
     }
 
-    public function has(Point $point): false|int
+    public function has(Vec2D $point): false|int
     {
         return $this->set[$point->getKey()] ?? false;
     }
@@ -65,7 +65,7 @@ class Route
         return $this->set[$key] ?? false;
     }
 
-    private function set(Point $point): void
+    private function set(Vec2D $point): void
     {
         $key = $point->getKey();
         if (!$this->has($point)) {

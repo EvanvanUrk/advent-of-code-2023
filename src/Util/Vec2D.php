@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AoC\Util;
 
-class Point
+class Vec2D
 {
     public function __construct(
         public readonly int $x,
@@ -16,24 +16,24 @@ class Point
         return $this->x . '-' . $this->y;
     }
 
-    public function add(Point $point): Point
+    public function add(Vec2D $point): Vec2D
     {
-        return new Point(
+        return new Vec2D(
             $this->x + $point->x,
             $this->y + $point->y,
         );
     }
 
-    public function sub(Point $point): Point
+    public function sub(Vec2D $point): Vec2D
     {
-        return new Point(
+        return new Vec2D(
             $this->x - $point->x,
             $this->y - $point->y
         );
     }
 
-    public function opposite(): Point
+    public function opposite(): Vec2D
     {
-        return new Point(-$this->x, -$this->y);
+        return new Vec2D(-$this->x, -$this->y);
     }
 }
