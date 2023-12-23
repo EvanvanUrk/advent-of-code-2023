@@ -12,6 +12,8 @@ class Map3D
     private array $map;
     private array $set = [];
 
+    private int $printWidth = 2;
+
     public function __construct(
         private int $w,
         private int $h,
@@ -42,7 +44,7 @@ class Map3D
 
     public function set(Vec3D $point, null|string|Stringable $value): void
     {
-        if ($this->inBounds($point)) {
+        if (!$this->inBounds($point)) {
             return;
         }
 
@@ -52,6 +54,18 @@ class Map3D
             unset($this->set[$point->getKey()]);
         } else {
             $this->set[$point->getKey()] = true;
+        }
+
+        $printWidth = strlen((string) $value) + 1;
+        if ($printWidth > $this->printWidth) {
+            $this->printWidth = $printWidth;
+        }
+    }
+
+    public function setRange(Vec3D $from, Vec3D $to, null|string|Stringable $value): void
+    {
+        foreach (Vec3D::range($from, $to) as $point) {
+            $this->set($point, $value);
         }
     }
 
@@ -73,24 +87,26 @@ class Map3D
         $str = '';
 
         $append = function(array $vals) use (&$str) {
-            $vals = array_filter(
+            $vals = array_values(array_unique(array_filter(
                 $vals,
                 fn(null|string|Stringable $val) => $val !== null
-            );
+            )));
 
             $count = count($vals);
             if ($count < 1) {
-                $str .= ' .';
+                $val = '.';
             } elseif($count > 1) {
-                $str .= ' ?';
+                $val = '?';
             } else {
-                $str .= $vals[0];
+                $val = $vals[0];
             }
+
+            $str .= str_pad($val, $this->printWidth, ' ', STR_PAD_LEFT);
         };
 
         // x by z - front
         foreach (range(0, $this->w - 1) as $x) {
-            $str .= ' ' . $x;
+            $str .= str_pad((string) $x, $this->printWidth, ' ', STR_PAD_LEFT);
         }
         $str .= PHP_EOL;
 
@@ -110,7 +126,7 @@ class Map3D
 
         // y by z - side
         foreach (range(0, $this->h - 1) as $y) {
-            $str .= ' ' . $y;
+            $str .= str_pad((string) $y, $this->printWidth, ' ', STR_PAD_LEFT);
         }
         $str .= PHP_EOL;
 
